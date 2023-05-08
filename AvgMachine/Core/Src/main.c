@@ -83,6 +83,24 @@ int fgetc(FILE * F)
    HAL_UART_Receive(&huart6,&ch_r,1,0xffff);//通过串口接收数据(超时时间65535毫秒)
    return ch_r;//返回接收到的数据信息
 }
+
+int GetFileLength(char* name)
+{
+    int ret;
+    FILINFO buf;
+
+    ret = f_stat(name, &buf);
+
+    if (ret == 0) {
+        //LOG_D("%s file size = %d", name, buf.st_size);
+        return buf.fsize;
+    } else {
+        //LOG_E("%s file not found");
+        return 0;
+    }
+}
+
+
 /* USER CODE END 0 */
 	uint32_t wtext[1024 * 5]; /* File write buffer */
 static void ReadWriteTest(void)
@@ -91,7 +109,7 @@ static void ReadWriteTest(void)
 	uint32_t byteswritten;                /* File write counts */
   uint32_t bytesread;                   /* File read counts */
 
-  char filename[] = "STM32cube.txt";
+  char filename[] = "test.bin";//"STM32cube.txt";
   char SensorBuff[100];
 	static uint32_t timeNow = 0;
 	static uint32_t timeNow1 = 0;
@@ -100,8 +118,11 @@ static void ReadWriteTest(void)
 	//printf("sd path = %s\r\n",SDPath);
 	memset((uint8_t *)wtext,0,sizeof(wtext));
 	
-  printf("********* STM32CubeMX FatFs Example *********\r\n\r\n"); 
+  printf("********* STM32CubeMX FatFs Example *********\r\n\r\n");
+	//1.文件挂载	
 	res = f_mount(&SDFatFS,SDPath,1); 	
+	
+	//2.文件写入
 //  if(res == FR_OK)
 //	{
 //      printf("f_mount sucess!!! \r\n");
@@ -144,6 +165,7 @@ static void ReadWriteTest(void)
 //		printf("f_mount error : %d \r\n",res);
 //	}
 
+		//3.文件读取 速度> 8m/s
 		retSD = f_open(&SDFile, filename, FA_READ | FA_OPEN_EXISTING);
     if(retSD)
 		{
@@ -157,7 +179,10 @@ static void ReadWriteTest(void)
 		HAL_RTC_GetTime(&hrtc, &GetTime, RTC_FORMAT_BIN);
 		timeNow =  GetTime.Hours * 3600 + GetTime.Minutes * 60 + GetTime.Seconds;
 		printf("%2d:%2d:%2d\r\n",GetTime.Hours,GetTime.Minutes,GetTime.Seconds);
-		size = 1024 * 40 * 1024 / sizeof(wtext);//读取40m
+		//读取当前文件的长度
+		int fileSize = GetFileLength(filename);
+		//printf("file length = %d",fileSize);
+		size = fileSize / sizeof(wtext);
 		printf("start reading--------------------------------, timenow = %d, size = %d\r\n", timeNow, size);
 		for(int i = 0; i < size; i++)
 		{
