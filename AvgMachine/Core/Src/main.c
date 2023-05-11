@@ -351,7 +351,7 @@ static void MX_RTC_Init(void)
   * @param None
   * @retval None
   */
-static void MX_SDIO_SD_Init(void)//Justin 可能引脚初始化有问题
+static void MX_SDIO_SD_Init(void)
 {
 
   /* USER CODE BEGIN SDIO_Init 0 */

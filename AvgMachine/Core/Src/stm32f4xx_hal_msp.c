@@ -137,7 +137,7 @@ void HAL_RTC_MspDeInit(RTC_HandleTypeDef* hrtc)
 * @param hsd: SD handle pointer
 * @retval None
 */
-void HAL_SD_MspInit(SD_HandleTypeDef* hsd)
+void HAL_SD_MspInit(SD_HandleTypeDef* hsd)//Justin 配置以下引脚
 {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
   if(hsd->Instance==SDIO)
